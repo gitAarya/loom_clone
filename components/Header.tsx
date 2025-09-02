@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import {ICONS} from "../constants/index"
+import DropDown from './DropDown'
 
 function Header({subHeader,title ,userImg}:SharedHeaderProps) {
   return (
@@ -9,7 +10,7 @@ function Header({subHeader,title ,userImg}:SharedHeaderProps) {
         <section className='header-container'>
             <div className='details '>
                 {userImg&& (
-                    <Image src={userImg|| '/assets/images/dummy.jpg'} alt='userImage' height={66} width={66} className='rounded-full '/>
+                    <Image src={userImg} alt='userImage' height={66} width={66} className='rounded-full '/>
                 )}
 
                 <article>
@@ -39,7 +40,7 @@ function Header({subHeader,title ,userImg}:SharedHeaderProps) {
                 <input type="text"  placeholder='Search for Videos,Tags,Folders...'/>
                 <Image src="/assets/icons/search.svg" alt='search' height={16} width={16}/>
             </div>
-            {/* <DropdownList/> */}
+            <DropDown/>
 
         </section>
     </header>
