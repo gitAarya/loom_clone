@@ -1,11 +1,9 @@
-declare interface User {
-  name: string;
-  email: string;
-  emailVerified: boolean;
-  image?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  id: string;
+import { Connection } from "mongoose";
+declare global{
+  var mongoose:{
+    conn:Connection|null,
+    promise:Promise<Connection>|null
+  }
 }
 
 type VideoFormValues = {
@@ -295,3 +293,5 @@ declare interface RecordingHandlers {
   onDataAvailable: (e: BlobEvent) => void;
   onStop: () => void;
 }
+
+export {}
