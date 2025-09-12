@@ -70,7 +70,7 @@ function page() {
             </Link>
           </button>
           <button className='bg-red-300'>
-            <Link href="/login">
+            <Link href="/register">
               <span>Register</span>
             </Link>
           </button>
