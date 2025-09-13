@@ -41,8 +41,8 @@ export default function LoginPage() {
           <h1 className="text-3xl font-extrabold text-gray-900">Sign in to your account</h1>
           <p className="mt-2 text-sm text-gray-600">
             Or{' '}
-            <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-              start your 14-day free trial
+            <a href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+              don't have an account? <span className="text-blue-600">register</span>
             </a>
           </p>
         </div>

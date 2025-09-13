@@ -2,6 +2,13 @@ import Header from "@/components/Header"
 import { dummyCards } from "@/constants"
 import Videocard from "@/components/Videocard"
 
+type ParamsWithSearch = {
+  params: {
+    id: string;
+    [key: string]: any;
+  };
+};
+
 
 async function page({params}:ParamsWithSearch) {
     const {id}= await params
