@@ -13,30 +13,8 @@ type VideoFormValues = {
   visibility: "public" | "private";
 };
 
-declare interface FormFieldProps {
-  id: string;
-  label: string;
-  type?: string;
-  value: string;
-  onChange: (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => void;
-  placeholder?: string;
-  as?: "input" | "textarea" | "select";
-  options?: Array<{ value: string; label: string }>;
-}
 
-declare interface FileInputProps {
-  id: string;
-  label: string;
-  accept: string;
-  file: File | null;
-  previewUrl: string | null;
-  inputRef: React.RefObject<HTMLInputElement | null>;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  onReset: () => void;
-  type: "video" | "image";
-}
+
 
 declare interface TranscriptEntry {
   time: string;
@@ -294,4 +272,4 @@ declare interface RecordingHandlers {
   onStop: () => void;
 }
 
-export {}
+export {  };
