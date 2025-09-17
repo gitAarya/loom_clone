@@ -3,7 +3,11 @@ import Link from 'next/link'
 import React from 'react'
 import {ICONS} from "../constants/index"
 import DropDown from './DropDown'
-
+declare interface SharedHeaderProps {
+  subHeader: string;
+  title: string;
+  userImg?: string;
+}
 function Header({subHeader,title ,userImg}:SharedHeaderProps) {
   return (
     <header className='header'>

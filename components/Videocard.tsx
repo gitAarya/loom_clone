@@ -1,4 +1,5 @@
 "use client"
+import { IKVideoProps } from "@imagekit/next";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -13,7 +14,7 @@ function Videocard({
     visibility,
     duration,
     views
-}:VideoCardProps) {
+}:IKVideoProps) {
   return (
 
 <Link href={`/video/${id}`}  className="video-card">

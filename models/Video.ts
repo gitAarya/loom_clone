@@ -1,5 +1,5 @@
 import mongoose,{Schema,model,models,Types} from "mongoose";
-declare interface IVideo {
+export  interface IVideo {
   _id: string;
   title: string;
   createdAt: Date;
