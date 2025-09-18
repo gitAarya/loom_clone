@@ -8,6 +8,7 @@ export  interface IVideo {
   visibility: "public" | "private" | "unlisted";
   videoUrl: string;
   thumbnailUrl: string;
+  description:string;
 }
 declare interface IUser {
   _id: string;
@@ -36,6 +37,10 @@ const VideoSchema = new Schema<IVideo>(
       required: true,
     },
     thumbnailUrl: {
+      type: String,
+      required: true,
+    },
+    description: {
       type: String,
       required: true,
     },

@@ -1,117 +1,133 @@
 "use client";
-import FilleInput from "@/components/FilleInput";
+import FileInput from "@/components/FileInput";
 import FormField from "@/components/FormField";
-import { MAX_THUMBNAIL_SIZE, MAX_VIDEO_SIZE } from "@/constants";
-import { usefileInput } from "@/lib/hooks/useFileInput";
-import { error } from "console";
-import { title } from "process";
+import { apiClient, VideoFormData } from "@/lib/ApiClient";
 import React, { ChangeEvent, FormEvent, useState } from "react";
-
-function page() {
-    const [isSubmitting, setisSubmitting] = useState(false);
-
-  const video=usefileInput(MAX_VIDEO_SIZE)
-  const thumbnail=usefileInput(MAX_THUMBNAIL_SIZE)
-  const [error, setError] = useState('');
-
-  const [formData, setformData] = useState({
-    title: "",
-    description: "",
-    visibility: "public",
-  });
+import { useSession, } from "next-auth/react";
 
 
+function Page() {
+  const [isSubmitting, setisSubmitting] = useState(false);
+  const [title, settitle] = useState("")
+  const [description, setdescription] = useState("")
+  const [visibility, setvisibility] = useState("public")
+  const [error, setError] = useState("");
+   const { data: session, status } = useSession();
   
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setformData((prevState) => ({ ...prevState, [name]: value }));
-  };
+  const [videoFile, setvideoFile] = useState<{url: string} | null>(null)
+const [thumbnailFile, setthumbnailFile] = useState<{url: string} | null>(null)
+  
+const handleVideoUploadSuccess=(uploadResponse:any)=>{
+setvideoFile({
+  url:uploadResponse.url
+})
+console.log(uploadResponse?.url);
 
-  const handleSubmit= async(e:FormEvent)=>{
-    e.preventDefault()
+}
+  
+const handleThumbnailUploadSuccess=(uploadResponse:any)=>{
+setthumbnailFile({
+  url:uploadResponse.url
+})
+console.log(uploadResponse?.url);
+
+}
+  
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
     setisSubmitting(true);
     try {
-      if(!video.file || thumbnail.file){
-        setError("please uplaod video and thumbnail")
-        return;
+     // Validate required fields
+      if (!title.trim()) {
+        throw new Error('Title is required');
       }
-      if(!formData.title || !formData.description){
-        setError("please fill in all the details")
-      }
-      //upload to imagekit
-      //upload to db
-      //attach thumbnail
-      //create a new db entry  for video details(urls data)
-    } catch (error) {
-      console.log("error submitting upload form");
       
-    }finally{
-      setisSubmitting(false)
+      if (!videoFile) {
+        throw new Error('Video file is required');
+      }
+
+     const videoData: VideoFormData = {
+  title: "My Video",
+  description: "Description",
+  videoUrl: "url",
+  thumbnailUrl: "thumb",
+  visibility: "public", // or the correct Visibility type
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  ownerId: session?.user.id as any, // Replace with actual user ID
+};
+
+      await apiClient.createVideo(videoData); 
+      alert('Video created successfully!');
+
+      
+      // Reset form
+      settitle('');
+      setdescription('');
+      setvideoFile(null);
+      setthumbnailFile(null);
+    } catch (error) {
+       console.error(error);
+      setError(error instanceof Error ? error.message : 'Failed to save video details');
+    } finally {
+      setisSubmitting(false);
     }
-  }
+  };
   return (
     <div className="wrapper-md upload-page">
       <h1>Uplaod Page</h1>
       {error && <div className="error-field">{error}</div>}
-      <form className="rounded-20 shadow-10 gap-6 w-full flex flex-col px-5 py-7" onSubmit={handleSubmit}>
+      <form
+        className="rounded-20 shadow-10 gap-6 w-full flex flex-col px-5 py-7"
+        onSubmit={handleSubmit}
+      >
         <FormField
           id="title"
           label="title"
-          value={formData.title}
-          onChange={handleInputChange}
+          value={title}
+          onChange={(e) => settitle(e.target.value)}
           placeholder="Enter the video title"
         />
         <FormField
           id="description"
           label="description"
-          value={formData.description}
+          value={description}
           as="textarea"
-          onChange={handleInputChange}
+          onChange={(e) => setdescription(e.target.value)}
           placeholder="Enter the video description"
         />
-        <FilleInput
-        id="video"
-        label="video"
-        accept="video/*"
-        file={video.file}
-        previewUrl={video.previewUrl}
-        inputRef={video.inputRef}
-        onChange={video.handleFileChange}
-        onReset={video.resetFile}
-        type="video"
+        <FileInput
+        onSuccess={handleVideoUploadSuccess}
+        fileType="video"
+        previewUrl={videoFile?.url}
+
+        />
+        
+        <FileInput
+        onSuccess={handleThumbnailUploadSuccess}
+        fileType="image"
+        previewUrl={thumbnailFile?.url}
 
         />
 
-        <FilleInput 
-        id="thumbnail"
-        label="thumbnail"
-        accept="image/*"
-        file={thumbnail.file}
-        previewUrl={thumbnail.previewUrl}
-        inputRef={thumbnail.inputRef}
-        onChange={thumbnail.handleFileChange}
-        onReset={thumbnail.resetFile}
-        type="image"/>
 
         <FormField
           id="visibility"
           label="visibility"
-          value={formData.visibility}
+          onChange={(e) => setvisibility(e.target.value)}
+          value={visibility}
           as="select"
-          onChange={handleInputChange}
           options={[
-            { value: "Public", label: "Public" },
+            { value: "public", label: "Public" },
             { value: "Private", label: "Private" },
           ]}
         />
-              <button type="submit" disabled={isSubmitting} className="submit-button">{
-  isSubmitting ? 'uploading...' : "Upload video"
-  } </button>
+        <button type="submit" disabled={isSubmitting} className="submit-button">
+          {isSubmitting ? "uploading..." : "Upload video"}{" "}
+        </button>
       </form>
     </div>
   );
 }
 
-export default page;
+export default Page;

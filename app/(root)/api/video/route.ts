@@ -1,63 +1,98 @@
 import { authOptions } from "@/lib/auth";
 import { ConnTODB } from "@/lib/DB";
 import Video from "@/models/Video";
-import { IKVideoProps } from "@imagekit/next";
-import { error } from "console";
-import { request } from "http";
-import { Session } from "inspector/promises";
+import { IVideo } from "@/models/Video";
+
+
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { json } from "stream/consumers";
 
-export async function GET() {
+export async function GET() 
+{
+
     try {
-       await ConnTODB()
-       const videos= await Video.find({}).sort({createdAt:-1}).lean()
-        if(!videos || videos.length ===0){
+        ConnTODB();
+         const videos = await Video.find({}).sort({ createdAt: 1 }).lean()
+         if(!videos){
+            return Response.json(
+                { error: "No video found" },
+                { status: 404 }
+            );
+         }
+         if(!videos || videos.length===0){
             return NextResponse.json(
-                [],{status:200}
+               [],{status:200}
             )
-        }
-
-        return NextResponse.json(
+         }
+         console.log(videos);
+         
+         return NextResponse.json(
             videos
-        )
-    } catch (error) {
-        return NextResponse.json(
-            {error:"fetech videos failed!"},
-            {status:500}
-        )
-    }
-    
-}
+         )
 
-export async function POST(request:NextRequest) {
-    try {
-       await getServerSession(authOptions)
-       if(!Session){
-        return NextResponse.json(
-            {error:"unauthorizes to uplaod"},
-            {status:401}
-        )
-       }
-       await ConnTODB()
-       const body:IKVideoProps = await request.json()
-       if(!body.title || !body.urlEndpoint ||body.thumbnailUrl){
-        return NextResponse.json(
-            {error:"missing required fields"},{status:500}
-        )
-       }
 
-       const videoData={...body,}
-     const newVideo=  await Video.create(videoData);
-     return NextResponse.json(
-        newVideo
-     )
     } catch (error) {
-        return NextResponse.json(
-            error,{status:500}
-        )
+        console.log("error in video auth", error);
+        return Response.json(
+            { error: "Failed to get video authentication parameters" },
+            { status: 500 }
+        );
         
     }
-    
+}
+
+export async function POST(request: NextRequest) {
+    try {
+        
+       const session = await getServerSession(authOptions);
+       console.log("session",session);
+       
+       if (!session) {
+        return NextResponse.json(
+            {
+                error: "unauthorized to upload"
+            },
+            {
+                status: 401
+            }
+        );
+       }
+
+       await ConnTODB();
+    //    console.log("body json ", await request.json());
+       
+      const body: IVideo = await request.json();
+    //   console.log("body", body);
+      
+      if (!body.title || !body.description || !body.videoUrl || !body.thumbnailUrl) {
+        return NextResponse.json(
+            {
+                error: "missing required fields"
+            },
+            {
+                status: 401
+            }
+        );
+      }
+
+      const videoData = {
+        ...body
+      };
+      const NewVideo = await Video.create(videoData);
+        return NextResponse.json(
+            NewVideo,
+            {
+                status: 201
+            }
+        );
+
+
+    } catch (error) {
+        console.log("error in video auth", error);
+        return NextResponse.json(
+            { error: "Failed to create video " },
+            { status: 500 }
+        );
+        
+    }
 }
